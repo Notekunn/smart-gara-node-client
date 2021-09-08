@@ -10,7 +10,7 @@ client.on('connect', function () {
 
 client.on('message', function (topic, message) {
   const context = message.toString()
-  const msg: IMessage = JSON.parse(context) as IMessage
+  const msg: IMessage = JSON.parse(context)
   try {
     switch (topic) {
       case 'mqtt/scan':

@@ -16,6 +16,7 @@ model Card {
     status       CardStatus @default(PENDING)
     type         CardType   @default(DATE)
 
+    History History[]
     @@map("card")
 }
 
@@ -24,13 +25,16 @@ model Parking {
     status ParkingStatus @default(BUSY)
     name   String        @db.VarChar(24)
 
+    History History[]
     @@map("parking")
 }
 
 model History {
     id        Int       @id @default(autoincrement())
     idCard    Int       @map("id_card")
+    card      Card      @relation(fields: [idCard], references: [id])
     idParking Int       @map("id_parking")
+    parking   Parking   @relation(fields: [idParking], references: [id])
     timeIn    DateTime  @default(now()) @map("time_in") @db.DateTime(0)
     timeOut   DateTime? @map("time_out") @db.DateTime(0)
 

@@ -20,6 +20,7 @@ const IRSensorHandler = async (client: Client, message: IMessage): Promise<void>
     if (!isFree && parking.status == 'BUSY') return
     // Rời khỏi vị trí đỗ
     if (isFree && parking.status == 'BUSY') {
+      // const card = await prisma.
     }
   }
 }
