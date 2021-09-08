@@ -1,9 +1,9 @@
-import { Message, debug } from '../utils'
+import { debug } from '../utils'
 import { Client } from 'mqtt'
 import { PrismaClient } from '@prisma/client'
 import { vn } from '../config/language'
 const prisma = new PrismaClient()
-const scanHandler = async (client: Client, message: Message): Promise<void> => {
+const scanHandler = async (client: Client, message: IMessage): Promise<void> => {
   debug.info('scan', message.action, message.payload)
   const rfid = `${message.payload}`
   // Mã thẻ không hợp lệ (nên thay bằng regex)

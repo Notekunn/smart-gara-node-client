@@ -1,13 +1,10 @@
-import { Message, debug } from '../utils'
+import { debug } from '../utils'
 import { Client } from 'mqtt'
 import { PrismaClient } from '@prisma/client'
 import { vn } from '../config/language'
 const prisma = new PrismaClient()
-interface IRChangePayload {
-  id: number
-  isFree: boolean
-}
-const IRSensorHandler = async (client: Client, message: Message): Promise<void> => {
+
+const IRSensorHandler = async (client: Client, message: IMessage): Promise<void> => {
   debug.info('ir-sensor', message.action, message.payload)
   if (message.action == 'change') {
     const { id, isFree } = message.payload as IRChangePayload

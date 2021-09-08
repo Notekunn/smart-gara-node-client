@@ -1,10 +1,10 @@
-import { Message, debug, caculateMoney, subtractTime, formatMoney } from '../utils'
+import { debug, caculateMoney, subtractTime, formatMoney } from '../utils'
 import { Client } from 'mqtt'
 import { PrismaClient } from '@prisma/client'
 import { vn } from '../config/language'
 const prisma = new PrismaClient()
 
-const carHandler = async (client: Client, message: Message): Promise<void> => {
+const carHandler = async (client: Client, message: IMessage): Promise<void> => {
   debug.info('car', message.action, message.payload)
   const cardId = parseInt(message.payload as string)
   if (message.action == 'in') {

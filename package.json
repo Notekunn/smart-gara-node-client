@@ -3,6 +3,7 @@
 	"version": "1.0.0",
 	"main": "index.js",
 	"license": "MIT",
+    "types": "./types/index.d.ts",
 	"scripts": {
 		"publisher": "ts-node publisher",
 		"subscriber": "ts-node subscriber",

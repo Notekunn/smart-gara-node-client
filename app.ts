@@ -1,7 +1,7 @@
 import client from './config/client'
 import express from 'express'
 import { scanHandler, carHandler } from './events'
-import { Message, debug } from './utils'
+import { debug } from './utils'
 import cardRouter from './routes/card'
 
 client.on('connect', function () {
@@ -10,7 +10,7 @@ client.on('connect', function () {
 
 client.on('message', function (topic, message) {
   const context = message.toString()
-  const msg: Message = JSON.parse(context) as Message
+  const msg: IMessage = JSON.parse(context) as IMessage
   try {
     switch (topic) {
       case 'mqtt/scan':
