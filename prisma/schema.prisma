@@ -1,0 +1,57 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+model Card {
+    id           Int        @id @default(autoincrement())
+    rfid         String     @unique @db.VarChar(24)
+    licencePlate String?    @map("licence_plate") @db.VarChar(24)
+    owner        String?    @db.VarChar(50)
+    createAt     DateTime   @default(now()) @db.Date
+    status       CardStatus @default(PENDING)
+    type         CardType   @default(DATE)
+
+    @@map("card")
+}
+
+model Parking {
+    id     Int           @id @default(autoincrement())
+    status ParkingStatus @default(BUSY)
+    name   String        @db.VarChar(24)
+
+    @@map("parking")
+}
+
+model History {
+    id        Int       @id @default(autoincrement())
+    idCard    Int       @map("id_card")
+    idParking Int       @map("id_parking")
+    timeIn    DateTime  @default(now()) @map("time_in") @db.DateTime(0)
+    timeOut   DateTime? @map("time_out") @db.DateTime(0)
+
+    @@map("history")
+}
+
+enum ParkingStatus {
+    FREE
+    BUSY
+}
+
+enum CardStatus {
+    PENDING
+    DRIVING_IN
+    PARKING
+    PAYING
+    OUT
+}
+
+// Theo tháng hoặc theo ngày
+enum CardType {
+    MONTH
+    DATE
+}
