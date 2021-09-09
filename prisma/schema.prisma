@@ -49,6 +49,7 @@ enum ParkingStatus {
 enum CardStatus {
     PENDING
     DRIVING_IN
+    DRIVING_OUT
     PARKING
     PAYING
     OUT

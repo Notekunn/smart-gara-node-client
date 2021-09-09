@@ -7,20 +7,77 @@ const prisma = new PrismaClient()
 const IRSensorHandler = async (client: Client, message: IMessage): Promise<void> => {
   debug.info('ir-sensor', message.action, message.payload)
   if (message.action == 'change') {
-    const { id, isFree } = message.payload as IRChangePayload
-    const parking = await prisma.parking.findUnique({
+    const { id, serving } = message.payload as IRChangePayload
+    debug.verbose('slot-change', id + '', serving)
+    // const parking = await prisma.parking.findUnique({
+    //   where: {
+    //     id,
+    //   },
+    // })
+    const history = await prisma.history.findFirst({
       where: {
-        id,
+        idParking: id,
+      },
+      include: {
+        card: true,
+        parking: true,
+      },
+      orderBy: {
+        timeIn: 'desc',
       },
     })
-    if (parking == null) return
+    if (history == null) return
+    const { parking, card } = history
+    if (parking == null || card == null) return
     // Nếu ở trạng thái free mà trống chỗ thì bỏ quá
-    if (isFree && parking.status == 'FREE') return
+    if (!serving && parking.status == 'FREE') return
     // Nếu ở trạng thái service mà kín chỗ thì bỏ qua
-    if (!isFree && parking.status == 'BUSY') return
-    // Rời khỏi vị trí đỗ
-    if (isFree && parking.status == 'BUSY') {
-      // const card = await prisma.
+    if (serving && parking.status == 'BUSY') return
+    // Rời khỏi vị trí đỗ -> serving = false
+    if (!serving && parking.status == 'BUSY') {
+      debug.info('Driving out', card.id + '', card.status)
+      // Nếu thẻ không ở trạng thái parking
+      if (card.status != 'PARKING') return
+      await prisma.history.update({
+        where: {
+          id: history.id,
+        },
+        data: {
+          parking: {
+            update: {
+              status: 'FREE',
+            },
+          },
+          card: {
+            update: {
+              status: 'DRIVING_OUT',
+            },
+          },
+        },
+      })
+    }
+    // Vào bãi đỗ xe -> serving = true
+    if (serving && parking.status == 'FREE') {
+      debug.info('Parking', card.id + '', card.status)
+      // Nếu thẻ không ở trạng thái driving in
+      if (card.status != 'DRIVING_IN') return
+      await prisma.history.update({
+        where: {
+          id: history.id,
+        },
+        data: {
+          parking: {
+            update: {
+              status: 'BUSY',
+            },
+          },
+          card: {
+            update: {
+              status: 'PARKING',
+            },
+          },
+        },
+      })
     }
   }
 }

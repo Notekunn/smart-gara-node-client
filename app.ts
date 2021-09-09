@@ -1,6 +1,6 @@
 import client from './config/client'
 import express from 'express'
-import { scanHandler, carHandler } from './events'
+import { scanHandler, carHandler, IRSensorHandler } from './events'
 import { debug } from './utils'
 import cardRouter from './routes/card'
 
@@ -18,6 +18,9 @@ client.on('message', function (topic, message) {
         break
       case 'mqtt/car':
         carHandler(client, msg)
+        break
+      case 'mqtt/ir':
+        IRSensorHandler(client, msg)
         break
       default:
         debug.info(topic, msg.action, msg.payload)

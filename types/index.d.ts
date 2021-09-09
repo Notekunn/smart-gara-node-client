@@ -4,5 +4,10 @@ declare interface IMessage {
 }
 declare interface IRChangePayload {
   id: number
-  isFree: boolean
+  serving: boolean
+}
+
+declare interface IDataSendLCD {
+  action: 'show' | 'clear'
+  payload: Array<string> | string
 }

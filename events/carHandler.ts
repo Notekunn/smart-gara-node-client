@@ -37,15 +37,15 @@ const carHandler = async (client: Client, message: IMessage): Promise<void> => {
         idParking: freeParking.id,
       },
     })
-    const parkingUpdate = prisma.parking.update({
-      where: {
-        id: freeParking.id,
-      },
-      data: {
-        status: 'BUSY',
-      },
-    })
-    await Promise.all([cardUpdate, historyInsert, parkingUpdate])
+    // const parkingUpdate = prisma.parking.update({
+    //   where: {
+    //     id: freeParking.id,
+    //   },
+    //   data: {
+    //     status: 'BUSY',
+    //   },
+    // })
+    await Promise.all([cardUpdate, historyInsert /*, parkingUpdate */])
     const dataSend = {
       action: 'show',
       payload: [vn.YOUR_SLOT, freeParking.name],
@@ -53,20 +53,17 @@ const carHandler = async (client: Client, message: IMessage): Promise<void> => {
     client.publish('mqtt/lcd', JSON.stringify(dataSend))
   }
   if (message.action == 'out') {
-    const history = await prisma.history.findFirst({
+    const history = await prisma.history.findUnique({
       where: {
-        idCard: message.payload,
-        timeOut: {
-          equals: null,
-        },
+        id: parseInt(message.payload + ''),
       },
-      orderBy: {
-        timeIn: 'desc',
+      include: {
+        card: true,
       },
     })
-    console.log(history)
+    // console.log(history)
     // Có lỗi xảy ra
-    if (history == null || history.timeOut != null) {
+    if (history == null) {
       await prisma.card.update({
         where: {
           id: cardId,

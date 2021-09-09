@@ -33,7 +33,7 @@ const scanHandler = async (client: Client, message: IMessage): Promise<void> => 
       })
     }
     // Thông báo
-    const dataSend = {
+    const dataSend: IDataSendLCD = {
       action: 'show',
       payload: [vn.NOT_EXIST_IN_SYSTEM],
     }
@@ -47,9 +47,59 @@ const scanHandler = async (client: Client, message: IMessage): Promise<void> => 
     debug.warn('car', 'Đang vào bãi rồi')
     return
   }
+  // Đang ra khỏi bãi -> Chuyển sang thanh toán
+  if (card.status == 'DRIVING_OUT') {
+    debug.info('car', 'Thanh toán')
+    const history = await prisma.history.findFirst({
+      where: {
+        idCard: card.id,
+      },
+      include: {
+        card: true,
+        parking: true,
+      },
+      orderBy: {
+        timeIn: 'desc',
+      },
+    })
+    if (history == null) {
+      debug.error('car', 'Không tìm thấy lịch sử đỗ xe')
+      return
+    }
+    await prisma.history.update({
+      where: {
+        id: history.id,
+      },
+      data: {
+        card: {
+          update: {
+            status: 'PAYING',
+          },
+        },
+        parking: {
+          update: {
+            status: 'FREE',
+          },
+        },
+      },
+    })
+    // await prisma.card.update({
+    //   where: {
+    //     id: card.id,
+    //   },
+    //   data: {
+    //     status: 'PAYING',
+    //   },
+    // })
+    const dataSend = {
+      action: 'out',
+      payload: history.id,
+    }
+    client.publish('mqtt/car', JSON.stringify(dataSend))
+  }
   // Đang thanh toán -> quẹt -> thanh toán xong
   if (card.status == 'PAYING') {
-    debug.info('car', 'Đang thanh toán')
+    debug.info('car', 'Thanh toán xong')
     await prisma.card.update({
       where: {
         id: card.id,
@@ -58,6 +108,11 @@ const scanHandler = async (client: Client, message: IMessage): Promise<void> => 
         status: 'OUT',
       },
     })
+    const dataSend: IDataSendLCD = {
+      action: 'show',
+      payload: [vn.GOODBYE],
+    }
+    client.publish('mqtt/lcd', JSON.stringify(dataSend))
     return
   }
   // Chưa vào bãi -> Quẹt thẻ vào
@@ -68,14 +123,6 @@ const scanHandler = async (client: Client, message: IMessage): Promise<void> => 
     }
     client.publish('mqtt/car', JSON.stringify(dataSend))
     return
-  }
-  // Đã vào bãi -> Quẹt thẻ ra ngoài
-  if (card.status == 'PARKING') {
-    const dataSend = {
-      action: 'out',
-      payload: card.id,
-    }
-    client.publish('mqtt/car', JSON.stringify(dataSend))
   }
 }
 export default scanHandler
