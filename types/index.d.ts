@@ -11,3 +11,8 @@ declare interface IDataSendLCD {
   action: 'show' | 'clear'
   payload: Array<string> | string
 }
+
+declare interface IDataSendCar {
+  action: 'in' | 'out'
+  payload: number
+}

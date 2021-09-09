@@ -91,7 +91,7 @@ const scanHandler = async (client: Client, message: IMessage): Promise<void> => 
     //     status: 'PAYING',
     //   },
     // })
-    const dataSend = {
+    const dataSend: IDataSendCar = {
       action: 'out',
       payload: history.id,
     }
@@ -117,7 +117,7 @@ const scanHandler = async (client: Client, message: IMessage): Promise<void> => 
   }
   // Chưa vào bãi -> Quẹt thẻ vào
   if (card.status == 'OUT') {
-    const dataSend = {
+    const dataSend: IDataSendCar = {
       action: 'in',
       payload: card.id,
     }
