@@ -15,9 +15,12 @@ const carHandler = async (client: Client, message: IMessage): Promise<void> => {
     })
     // Hết chỗ
     if (freeParking == null) {
-      const dataSend = {
+      const dataSend: IDataSendLCD = {
         action: 'show',
-        payload: [vn.FULL_SLOT, vn.COME_BACK_LATER],
+        payload: {
+          lcd: 'IN',
+          message: [vn.FULL_SLOT, vn.COME_BACK_LATER],
+        },
       }
       client.publish('mqtt/lcd', JSON.stringify(dataSend))
       return
@@ -46,9 +49,12 @@ const carHandler = async (client: Client, message: IMessage): Promise<void> => {
     //   },
     // })
     await Promise.all([cardUpdate, historyInsert /*, parkingUpdate */])
-    const dataSend = {
+    const dataSend: IDataSendLCD = {
       action: 'show',
-      payload: [vn.YOUR_SLOT, freeParking.name],
+      payload: {
+        lcd: 'IN',
+        message: [vn.YOUR_SLOT, freeParking.name],
+      },
     }
     client.publish('mqtt/lcd', JSON.stringify(dataSend))
   }
@@ -72,9 +78,12 @@ const carHandler = async (client: Client, message: IMessage): Promise<void> => {
           status: 'OUT',
         },
       })
-      const dataSend = {
+      const dataSend: IDataSendLCD = {
         action: 'show',
-        payload: [vn.SOME_THING_ERROR],
+        payload: {
+          lcd: 'OUT',
+          message: [vn.SOME_THING_ERROR],
+        },
       }
       client.publish('mqtt/lcd', JSON.stringify(dataSend))
       return
@@ -89,9 +98,12 @@ const carHandler = async (client: Client, message: IMessage): Promise<void> => {
       },
     })
     const money = caculateMoney(subtractTime(history.timeIn, new Date()))
-    const dataSend = {
+    const dataSend: IDataSendLCD = {
       action: 'show',
-      payload: [vn.TOTAL_MONEY, formatMoney(money)],
+      payload: {
+        lcd: 'OUT',
+        message: [vn.TOTAL_MONEY, formatMoney(money)],
+      },
     }
     client.publish('mqtt/lcd', JSON.stringify(dataSend))
     return

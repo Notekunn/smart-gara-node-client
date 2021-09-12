@@ -35,7 +35,10 @@ const scanHandler = async (client: Client, message: IMessage): Promise<void> => 
     // Thông báo
     const dataSend: IDataSendLCD = {
       action: 'show',
-      payload: [vn.NOT_EXIST_IN_SYSTEM],
+      payload: {
+        lcd: 'IN',
+        message: [vn.NOT_EXIST_IN_SYSTEM],
+      },
     }
     client.publish('mqtt/lcd', JSON.stringify(dataSend))
     return
@@ -92,7 +95,7 @@ const scanHandler = async (client: Client, message: IMessage): Promise<void> => 
     //   },
     // })
     const dataSend: IDataSendCar = {
-      action: 'out',
+      action: 'OUT',
       payload: history.id,
     }
     client.publish('mqtt/car', JSON.stringify(dataSend))
@@ -110,7 +113,10 @@ const scanHandler = async (client: Client, message: IMessage): Promise<void> => 
     })
     const dataSend: IDataSendLCD = {
       action: 'show',
-      payload: [vn.GOODBYE],
+      payload: {
+        lcd: 'OUT',
+        message: [vn.GOODBYE],
+      },
     }
     client.publish('mqtt/lcd', JSON.stringify(dataSend))
     return
@@ -118,7 +124,7 @@ const scanHandler = async (client: Client, message: IMessage): Promise<void> => 
   // Chưa vào bãi -> Quẹt thẻ vào
   if (card.status == 'OUT') {
     const dataSend: IDataSendCar = {
-      action: 'in',
+      action: 'IN',
       payload: card.id,
     }
     client.publish('mqtt/car', JSON.stringify(dataSend))

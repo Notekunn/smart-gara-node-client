@@ -7,12 +7,21 @@ declare interface IRChangePayload {
   serving: boolean
 }
 
+interface IDataSendLCDPayload {
+  lcd: 'IN' | 'OUT'
+  message: Array<string> | string
+}
 declare interface IDataSendLCD {
   action: 'show' | 'clear'
-  payload: Array<string> | string
+  payload: IDataSendLCDPayload
 }
 
 declare interface IDataSendCar {
-  action: 'in' | 'out'
+  action: 'IN' | 'OUT'
   payload: number
+}
+
+declare interface IDataSendGate {
+  action: 'OPEN' | 'CLOSE'
+  payload: 'IN' | 'OUT'
 }
