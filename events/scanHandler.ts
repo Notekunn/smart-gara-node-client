@@ -119,6 +119,12 @@ const scanHandler = async (client: Client, message: IMessage): Promise<void> => 
       },
     }
     client.publish('mqtt/lcd', JSON.stringify(dataSend))
+
+    const dataSend2: IDataSendGate = {
+      action: 'OPEN',
+      payload: 'OUT',
+    }
+    client.publish('mqtt/gate', JSON.stringify(dataSend2))
     return
   }
   // Chưa vào bãi -> Quẹt thẻ vào

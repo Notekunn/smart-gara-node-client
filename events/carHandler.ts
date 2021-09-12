@@ -57,6 +57,12 @@ const carHandler = async (client: Client, message: IMessage): Promise<void> => {
       },
     }
     client.publish('mqtt/lcd', JSON.stringify(dataSend))
+    // Mở cổng
+    const dataSend2: IDataSendGate = {
+      action: 'OPEN',
+      payload: 'IN',
+    }
+    client.publish('mqtt/gate', JSON.stringify(dataSend2))
   }
   if (message.action == 'out') {
     const history = await prisma.history.findUnique({
