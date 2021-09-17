@@ -20,5 +20,8 @@ export const caculateMoney = (minutes: number): number => {
   else return hours * 2000
 }
 export const formatMoney = (money: number): string => {
-  return Number(money.toFixed(1)).toLocaleString()
+  return money.toFixed(1)
+}
+export const formatSlot = (slot: string): string => {
+  return slot.padStart(16, ' ')
 }

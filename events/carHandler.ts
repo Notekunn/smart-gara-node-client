@@ -1,4 +1,4 @@
-import { debug, caculateMoney, subtractTime, formatMoney } from '../utils'
+import { debug, caculateMoney, subtractTime, formatMoney, formatSlot } from '../utils'
 import { Client } from 'mqtt'
 import { PrismaClient } from '@prisma/client'
 import { vn } from '../config/language'
@@ -7,7 +7,7 @@ const prisma = new PrismaClient()
 const carHandler = async (client: Client, message: IMessage): Promise<void> => {
   debug.info('car', message.action, message.payload)
   const cardId = parseInt(message.payload as string)
-  if (message.action == 'in') {
+  if (message.action == 'IN') {
     const freeParking = await prisma.parking.findFirst({
       where: {
         status: 'FREE',
@@ -38,22 +38,24 @@ const carHandler = async (client: Client, message: IMessage): Promise<void> => {
       data: {
         idCard: cardId,
         idParking: freeParking.id,
+        timeIn: new Date(),
       },
     })
-    // const parkingUpdate = prisma.parking.update({
-    //   where: {
-    //     id: freeParking.id,
-    //   },
-    //   data: {
-    //     status: 'BUSY',
-    //   },
-    // })
-    await Promise.all([cardUpdate, historyInsert /*, parkingUpdate */])
+    // Đổi trạng thái bãi đỗ xe thành inserving
+    const parkingUpdate = prisma.parking.update({
+      where: {
+        id: freeParking.id,
+      },
+      data: {
+        status: 'INSERVING',
+      },
+    })
+    await Promise.all([cardUpdate, historyInsert, parkingUpdate])
     const dataSend: IDataSendLCD = {
       action: 'show',
       payload: {
         lcd: 'IN',
-        message: [vn.YOUR_SLOT, freeParking.name],
+        message: [vn.YOUR_SLOT, formatSlot(freeParking.name)],
       },
     }
     client.publish('mqtt/lcd', JSON.stringify(dataSend))
@@ -64,7 +66,7 @@ const carHandler = async (client: Client, message: IMessage): Promise<void> => {
     }
     client.publish('mqtt/gate', JSON.stringify(dataSend2))
   }
-  if (message.action == 'out') {
+  if (message.action == 'OUT') {
     const history = await prisma.history.findUnique({
       where: {
         id: parseInt(message.payload + ''),

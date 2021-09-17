@@ -6,6 +6,13 @@ const prisma = new PrismaClient()
 
 const IRSensorHandler = async (client: Client, message: IMessage): Promise<void> => {
   debug.info('ir-sensor', message.action, message.payload)
+  /**
+   * Cảm biến để thay đổi trang thái đỗ xe
+   * FREE->INSERVING->SERVING
+   * FREE: sẵn sàng phục vụ
+   * INSERVING: Đã được hen trước
+   * SERVING: đang phục vụ
+   */
   if (message.action == 'change') {
     const { id, serving } = message.payload as IRChangePayload
     debug.verbose('slot-change', id + '', serving)
@@ -30,11 +37,12 @@ const IRSensorHandler = async (client: Client, message: IMessage): Promise<void>
     const { parking, card } = history
     if (parking == null || card == null) return
     // Nếu ở trạng thái free mà trống chỗ thì bỏ quá
-    if (!serving && parking.status == 'FREE') return
+    // if (!serving && parking.status == 'FREE') return
     // Nếu ở trạng thái service mà kín chỗ thì bỏ qua
-    if (serving && parking.status == 'BUSY') return
+    // if (serving && parking.status == 'SERVING') return
+
     // Rời khỏi vị trí đỗ -> serving = false
-    if (!serving && parking.status == 'BUSY') {
+    if (!serving && parking.status == 'SERVING') {
       debug.info('Driving out', card.id + '', card.status)
       // Nếu thẻ không ở trạng thái parking
       if (card.status != 'PARKING') return
@@ -57,7 +65,7 @@ const IRSensorHandler = async (client: Client, message: IMessage): Promise<void>
       })
     }
     // Vào bãi đỗ xe -> serving = true
-    if (serving && parking.status == 'FREE') {
+    if (serving && parking.status == 'INSERVING') {
       debug.info('Parking', card.id + '', card.status)
       // Nếu thẻ không ở trạng thái driving in
       if (card.status != 'DRIVING_IN') return
@@ -68,7 +76,7 @@ const IRSensorHandler = async (client: Client, message: IMessage): Promise<void>
         data: {
           parking: {
             update: {
-              status: 'BUSY',
+              status: 'SERVING',
             },
           },
           card: {

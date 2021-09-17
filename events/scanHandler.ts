@@ -7,6 +7,7 @@ const scanHandler = async (client: Client, message: IMessage): Promise<void> => 
   debug.info('scan', message.action, message.payload)
   const rfid = `${message.payload}`
   // Mã thẻ không hợp lệ (nên thay bằng regex)
+
   if (rfid == null || rfid.length < 10) return
   if (message.action != 'read') return
 
