@@ -2,6 +2,10 @@ import { debug } from '../utils'
 import { Client } from 'mqtt'
 import { PrismaClient } from '@prisma/client'
 import { vn } from '../config/language'
+const masterCache: IMasterCache = {
+  lastCard: null,
+  step: 0,
+}
 const prisma = new PrismaClient()
 const scanHandler = async (client: Client, message: IMessage): Promise<void> => {
   debug.info('scan', message.action, message.payload)
@@ -33,6 +37,7 @@ const scanHandler = async (client: Client, message: IMessage): Promise<void> => 
         },
       })
     }
+    masterCache.lastCard = rfid
     // Thông báo
     const dataSend: IDataSendLCD = {
       action: 'show',
@@ -44,7 +49,54 @@ const scanHandler = async (client: Client, message: IMessage): Promise<void> => 
     client.publish('mqtt/lcd', JSON.stringify(dataSend))
     return
   }
+  // Xử lý card admin
+  if (card.type == 'MASTER') {
+    // Nếu chưa có thẻ nào k đăng ký
+    if (masterCache.lastCard == null) return
+    // Hiện thông báo xác nhận đăng ký
+    if (masterCache.step == 0) {
+      const dataSend: IDataSendLCD = {
+        action: 'show',
+        payload: {
+          lcd: 'IN',
+          message: [vn.CONFIRM_REGISTER],
+        },
+      }
+      masterCache.step = 1
+      setTimeout(() => {
+        masterCache.step = 0
+        masterCache.lastCard = null
+      }, 5000)
+      client.publish('mqtt/lcd', JSON.stringify(dataSend))
+      return
+    }
+    //Đăng ký xong
+    if (masterCache.step == 1) {
+      masterCache.step = 0
+      masterCache.lastCard = null
+      await prisma.card.update({
+        where: {
+          rfid,
+        },
+        data: {
+          owner: 'Administrator',
+          status: 'OUT',
+        },
+      })
+      const dataSend: IDataSendLCD = {
+        action: 'show',
+        payload: {
+          lcd: 'IN',
+          message: [vn.REGISTER_SUCCESS],
+        },
+      }
+      client.publish('mqtt/lcd', JSON.stringify(dataSend))
+      return
+    }
 
+    return
+  }
+  masterCache.lastCard = null
   // Nếu card đăng ký rồi -> Kiểm tra trạng thái
   // đang vào bãi -> Quẹt 2 lần -> bỏ qua
   if (card.status == 'DRIVING_IN') {

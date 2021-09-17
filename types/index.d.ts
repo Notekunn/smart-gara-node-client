@@ -25,3 +25,8 @@ declare interface IDataSendGate {
   action: 'OPEN' | 'CLOSE'
   payload: 'IN' | 'OUT'
 }
+
+declare interface IMasterCache {
+  lastCard: string | null
+  step: 0 | 1
+}
