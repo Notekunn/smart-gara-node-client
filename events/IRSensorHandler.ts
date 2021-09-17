@@ -43,7 +43,7 @@ const IRSensorHandler = async (client: Client, message: IMessage): Promise<void>
 
     // Rời khỏi vị trí đỗ -> serving = false
     if (!serving && parking.status == 'SERVING') {
-      debug.info('Driving out', card.id + '', card.status)
+      debug.info('parking', card.id + '', 'leaving')
       // Nếu thẻ không ở trạng thái parking
       if (card.status != 'PARKING') return
       await prisma.history.update({
@@ -66,7 +66,7 @@ const IRSensorHandler = async (client: Client, message: IMessage): Promise<void>
     }
     // Vào bãi đỗ xe -> serving = true
     if (serving && parking.status == 'INSERVING') {
-      debug.info('Parking', card.id + '', card.status)
+      debug.info('parking', card.id + '', 'driving in')
       // Nếu thẻ không ở trạng thái driving in
       if (card.status != 'DRIVING_IN') return
       await prisma.history.update({
