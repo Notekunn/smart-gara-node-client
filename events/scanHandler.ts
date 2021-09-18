@@ -72,14 +72,14 @@ const scanHandler = async (client: Client, message: IMessage): Promise<void> => 
     }
     //Đăng ký xong
     if (masterCache.step == 1) {
-      masterCache.step = 0
-      masterCache.lastCard = null
       await prisma.card.update({
         where: {
-          rfid,
+          rfid: masterCache.lastCard,
         },
         data: {
           owner: 'Administrator',
+          licencePlate: '1234567',
+          createAt: new Date(),
           status: 'OUT',
         },
       })
@@ -91,6 +91,8 @@ const scanHandler = async (client: Client, message: IMessage): Promise<void> => 
         },
       }
       client.publish('mqtt/lcd', JSON.stringify(dataSend))
+      masterCache.step = 0
+      masterCache.lastCard = null
       return
     }
 

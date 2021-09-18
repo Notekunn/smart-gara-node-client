@@ -7,8 +7,11 @@ const opts: IClientOptions = !!MQTT_USER
   ? {
       username: MQTT_USER,
       password: MQTT_PASS,
+      clientId: 'node-client',
     }
-  : {}
+  : {
+      clientId: 'node-client',
+    }
 
 const client = mqtt.connect(brokerUrl, opts)
 

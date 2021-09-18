@@ -5,6 +5,7 @@ import { debug } from './utils'
 import cardRouter from './routes/card'
 
 client.on('connect', function () {
+  debug.info('mqtt', 'Connect to mqtt server success')
   client.subscribe('mqtt/#')
 })
 
