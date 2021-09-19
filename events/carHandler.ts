@@ -1,5 +1,6 @@
 import { debug, caculateMoney, subtractTime, formatMoney, formatSlot } from '../utils'
 import { Client } from 'mqtt'
+import { ROOT_CHANNEL } from '../config/'
 import { PrismaClient } from '@prisma/client'
 import { vn } from '../config/language'
 const prisma = new PrismaClient()
@@ -22,7 +23,7 @@ const carHandler = async (client: Client, message: IMessage): Promise<void> => {
           message: [vn.FULL_SLOT, vn.COME_BACK_LATER],
         },
       }
-      client.publish('mqtt/lcd', JSON.stringify(dataSend))
+      client.publish(`${ROOT_CHANNEL}/lcd`, JSON.stringify(dataSend))
       return
     }
     // Set trạng thái cho xe (đang vào bãi)
@@ -58,13 +59,13 @@ const carHandler = async (client: Client, message: IMessage): Promise<void> => {
         message: [vn.YOUR_SLOT, formatSlot(freeParking.name)],
       },
     }
-    client.publish('mqtt/lcd', JSON.stringify(dataSend))
+    client.publish(`${ROOT_CHANNEL}/lcd`, JSON.stringify(dataSend))
     // Mở cổng
     const dataSend2: IDataSendGate = {
       action: 'OPEN',
       payload: 'IN',
     }
-    client.publish('mqtt/gate', JSON.stringify(dataSend2))
+    client.publish(`${ROOT_CHANNEL}/gate`, JSON.stringify(dataSend2))
   }
   if (message.action == 'OUT') {
     const history = await prisma.history.findUnique({
@@ -93,7 +94,7 @@ const carHandler = async (client: Client, message: IMessage): Promise<void> => {
           message: [vn.SOME_THING_ERROR],
         },
       }
-      client.publish('mqtt/lcd', JSON.stringify(dataSend))
+      client.publish(`${ROOT_CHANNEL}/lcd`, JSON.stringify(dataSend))
       return
     }
     // Yêu cầu trả tiền
@@ -113,7 +114,7 @@ const carHandler = async (client: Client, message: IMessage): Promise<void> => {
         message: [vn.TOTAL_MONEY, formatMoney(money)],
       },
     }
-    client.publish('mqtt/lcd', JSON.stringify(dataSend))
+    client.publish(`${ROOT_CHANNEL}/lcd`, JSON.stringify(dataSend))
     return
   }
 }

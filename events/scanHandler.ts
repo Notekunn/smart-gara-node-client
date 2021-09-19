@@ -2,6 +2,7 @@ import { debug } from '../utils'
 import { Client } from 'mqtt'
 import { PrismaClient } from '@prisma/client'
 import { vn } from '../config/language'
+import { ROOT_CHANNEL } from '../config/'
 const masterCache: IMasterCache = {
   lastCard: null,
   step: 0,
@@ -46,7 +47,7 @@ const scanHandler = async (client: Client, message: IMessage): Promise<void> => 
         message: [vn.NOT_EXIST_IN_SYSTEM],
       },
     }
-    client.publish('mqtt/lcd', JSON.stringify(dataSend))
+    client.publish(`${ROOT_CHANNEL}/lcd`, JSON.stringify(dataSend))
     return
   }
   // Xử lý card admin
@@ -67,7 +68,7 @@ const scanHandler = async (client: Client, message: IMessage): Promise<void> => 
         masterCache.step = 0
         masterCache.lastCard = null
       }, 5000)
-      client.publish('mqtt/lcd', JSON.stringify(dataSend))
+      client.publish(`${ROOT_CHANNEL}/lcd`, JSON.stringify(dataSend))
       return
     }
     //Đăng ký xong
@@ -90,7 +91,7 @@ const scanHandler = async (client: Client, message: IMessage): Promise<void> => 
           message: [vn.REGISTER_SUCCESS],
         },
       }
-      client.publish('mqtt/lcd', JSON.stringify(dataSend))
+      client.publish(`${ROOT_CHANNEL}/lcd`, JSON.stringify(dataSend))
       masterCache.step = 0
       masterCache.lastCard = null
       return
@@ -153,7 +154,7 @@ const scanHandler = async (client: Client, message: IMessage): Promise<void> => 
       action: 'OUT',
       payload: history.id,
     }
-    client.publish('mqtt/car', JSON.stringify(dataSend))
+    client.publish(`${ROOT_CHANNEL}/car`, JSON.stringify(dataSend))
   }
   // Đang thanh toán -> quẹt -> thanh toán xong
   if (card.status == 'PAYING') {
@@ -173,13 +174,13 @@ const scanHandler = async (client: Client, message: IMessage): Promise<void> => 
         message: [vn.GOODBYE],
       },
     }
-    client.publish('mqtt/lcd', JSON.stringify(dataSend))
+    client.publish(`${ROOT_CHANNEL}/lcd`, JSON.stringify(dataSend))
 
     const dataSend2: IDataSendGate = {
       action: 'OPEN',
       payload: 'OUT',
     }
-    client.publish('mqtt/gate', JSON.stringify(dataSend2))
+    client.publish(`${ROOT_CHANNEL}/gate`, JSON.stringify(dataSend2))
     return
   }
   // Chưa vào bãi -> Quẹt thẻ vào
@@ -188,7 +189,7 @@ const scanHandler = async (client: Client, message: IMessage): Promise<void> => 
       action: 'IN',
       payload: card.id,
     }
-    client.publish('mqtt/car', JSON.stringify(dataSend))
+    client.publish(`${ROOT_CHANNEL}/car`, JSON.stringify(dataSend))
     return
   }
 }

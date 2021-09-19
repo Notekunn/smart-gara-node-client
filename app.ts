@@ -1,12 +1,13 @@
 import client from './config/client'
 import express from 'express'
+import { ROOT_CHANNEL } from './config/'
 import { scanHandler, carHandler, IRSensorHandler } from './events'
 import { debug } from './utils'
 import cardRouter from './routes/card'
 
 client.on('connect', function () {
   debug.info('mqtt', 'Connect to mqtt server success')
-  client.subscribe('mqtt/#')
+  client.subscribe(`${ROOT_CHANNEL}/#`)
 })
 
 client.on('message', function (topic, message) {
@@ -14,13 +15,13 @@ client.on('message', function (topic, message) {
   const msg: IMessage = JSON.parse(context)
   try {
     switch (topic) {
-      case 'mqtt/scan':
+      case `${ROOT_CHANNEL}/scan`:
         scanHandler(client, msg)
         break
-      case 'mqtt/car':
+      case `${ROOT_CHANNEL}/car`:
         carHandler(client, msg)
         break
-      case 'mqtt/ir':
+      case `${ROOT_CHANNEL}/ir`:
         IRSensorHandler(client, msg)
         break
       default:
