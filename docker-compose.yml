@@ -1,0 +1,54 @@
+version: '3.4'
+
+services:
+  node_client:
+    container_name: iot_node_client
+    image: node_client
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    depends_on:
+      - "mqtt_server"
+      - "database"
+    environment:
+      NODE_ENV: production
+      MQTT_HOST: mqtt_server
+      MQTT_PORT: 1883
+      MQTT_USER: notekunn
+      MQTT_PASS: tieulinh123
+      DATABASE_URL: mysql://root:@database:3306/smart_parking
+    ports:
+      - 3000:8080
+    networks:
+      - default  
+    # volumes:
+    #   - ./:/usr/src/app
+  mqtt_server:
+    image: eclipse-mosquitto
+    restart: always
+    volumes:
+      - ./data/mosquitto/:/mosquitto/config/
+    #   - ./data/mosquitto/config/pwfile:/mosquitto/config/pwfile
+      - mqtt_volume_data:/mosquitto/data
+      - mqtt_volume_log:/mosquitto/log
+    ports:
+      - 1888:1883
+      - 9001:9001
+    networks:
+      - default  
+  database:
+    image: mysql
+    ports:
+      - 3305:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: 
+      MYSQL_ALLOW_EMPTY_PASSWORD: true
+      MYSQL_DATABASE: smart_parking
+    networks:
+      - default  
+    volumes:
+      - mysql_data:/var/lib/mysql
+volumes:
+    mqtt_volume_data:
+    mqtt_volume_log:
+    mysql_data:

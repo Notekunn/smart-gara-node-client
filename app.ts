@@ -9,6 +9,9 @@ client.on('connect', function () {
   debug.info('mqtt', 'Connect to mqtt server success')
   client.subscribe(`${ROOT_CHANNEL}/#`)
 })
+client.on('error', function (err) {
+  console.log(err)
+})
 
 client.on('message', function (topic, message) {
   const context = message.toString()

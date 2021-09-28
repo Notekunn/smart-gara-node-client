@@ -4,10 +4,11 @@
 	"license": "MIT",
     "types": "./types/index.d.ts",
 	"scripts": {
-		"publisher": "ts-node publisher",
-		"subscriber": "ts-node subscriber",
-		"start": "ts-node app",
-        "test": "ts-node ./test/index.test.ts"
+		"dev": "ts-node app",
+        "test": "ts-node ./test/index.test.ts",
+        "generate": "npx prisma generate",
+        "build": "tsc",
+        "build:watch": "tsc -w"
 	},
 	"devDependencies": {
 		"@types/express": "^4.17.13",

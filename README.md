@@ -5,3 +5,8 @@ npx prisma db push
 npx prisma generate
 yarn start
 ```
+# Deploy
+
+```bash
+docker-compose up -d
+```

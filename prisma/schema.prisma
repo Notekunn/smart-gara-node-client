@@ -12,7 +12,7 @@ model Card {
     rfid         String     @unique @db.VarChar(24)
     licencePlate String?    @map("licence_plate") @db.VarChar(24)
     owner        String?    @db.VarChar(50)
-    createAt     DateTime   @default(now()) @db.Date
+    createAt     DateTime   @default(now()) @db.DateTime(0)
     status       CardStatus @default(PENDING)
     type         CardType   @default(DATE)
 
