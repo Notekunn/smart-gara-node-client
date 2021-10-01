@@ -1,7 +1,7 @@
 import { Request, Router } from 'express'
 import { PrismaClient } from '@prisma/client'
 import type { Prisma } from '@prisma/client'
-import { sendAll, sendOne } from '../config/apiAdapter'
+import { sendAll, sendError, sendOne } from '../config/apiAdapter'
 const prisma = new PrismaClient()
 const router = Router()
 
@@ -20,10 +20,7 @@ router
       },
     })
     if (card == null) {
-      res.status(400).send({
-        error: true,
-        message: 'Card not found!',
-      })
+      res.status(400).json(sendError('Card is not found'))
       return
     }
     res.status(200).json(sendOne(card))

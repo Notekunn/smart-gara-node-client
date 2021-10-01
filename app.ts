@@ -4,6 +4,7 @@ import { ROOT_CHANNEL } from './config/'
 import { scanHandler, carHandler, IRSensorHandler } from './events'
 import { debug } from './utils'
 import cardRouter from './routes/card'
+import historyRouter from './routes/history'
 import cors from 'cors'
 
 client.on('connect', function () {
@@ -43,6 +44,7 @@ app.get('/', (req, res) => {
   res.send('Hello world')
 })
 app.use('/cards', cardRouter)
+app.use('/history', historyRouter)
 
 app.listen(8080, () => {
   console.log('Listening in 8080')
