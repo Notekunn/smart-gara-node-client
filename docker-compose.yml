@@ -18,7 +18,7 @@ services:
       MQTT_PASS: tieulinh123
       DATABASE_URL: mysql://root:@database:3306/smart_parking
     ports:
-      - 3000:8080
+      - 8080:8080
     networks:
       - default  
     # volumes:

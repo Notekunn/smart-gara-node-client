@@ -4,6 +4,7 @@ import { ROOT_CHANNEL } from './config/'
 import { scanHandler, carHandler, IRSensorHandler } from './events'
 import { debug } from './utils'
 import cardRouter from './routes/card'
+import cors from 'cors'
 
 client.on('connect', function () {
   debug.info('mqtt', 'Connect to mqtt server success')
@@ -37,7 +38,7 @@ client.on('message', function (topic, message) {
 
 const app = express()
 app.use(express.json())
-
+app.use(cors())
 app.get('/', (req, res) => {
   res.send('Hello world')
 })
