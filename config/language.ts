@@ -6,7 +6,8 @@ export const vn = {
   WAIT_FOR_ACCEPT: 'Vui long cho..',
   NOT_EXIST_IN_SYSTEM: 'Chua dang ky',
   YOUR_SLOT: 'Cho cua ban:',
-  GOODBYE: 'Thuong lo binh an',
+  GOODBYE: 'Thuong lo',
+  GOODBYE2: 'binh an',
   CONFIRM_REGISTER: 'Quet de xac nhan',
   REGISTER_SUCCESS: 'Thanh cong',
 }

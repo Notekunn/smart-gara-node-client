@@ -1,4 +1,4 @@
-import { debug } from '../utils'
+import { debug, formatSlot } from '../utils'
 import { Client } from 'mqtt'
 import { PrismaClient } from '@prisma/client'
 import { vn } from '../config/language'
@@ -171,7 +171,7 @@ const scanHandler = async (client: Client, message: IMessage): Promise<void> => 
       action: 'show',
       payload: {
         lcd: 'OUT',
-        message: [vn.GOODBYE],
+        message: [vn.GOODBYE, formatSlot(vn.GOODBYE2)],
       },
     }
     client.publish(`${ROOT_CHANNEL}/lcd`, JSON.stringify(dataSend))
